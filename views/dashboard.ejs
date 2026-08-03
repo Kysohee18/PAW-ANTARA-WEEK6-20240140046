@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - RBAC System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800">
+    <div class="flex min-h-screen items-center justify-center px-4 py-10">
+        <div class="w-full max-w-4xl rounded-3xl border border-slate-200 bg-white p-8 shadow-lg shadow-slate-200/70">
+            <!-- Header -->
+            <div class="mb-6 flex items-center justify-between gap-4 border-b border-slate-100 pb-6">
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-[0.3em] text-sky-600">Dashboard RBAC</p>
+                    <h1 class="mt-1 text-3xl font-semibold text-slate-900">
+                        Selamat Datang, <%= user.name %>!
+                    </h1>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider <%= user.role === 'admin' ? 'bg-purple-100 text-purple-700 border border-purple-300' : 'bg-blue-100 text-blue-700 border border-blue-300' %>">
+                        Role: <%= user.role %>
+                    </span>
+                    <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-600">
+                        Authenticated
+                    </span>
+                </div>
+            </div>
+
+            <!-- Error Banner (For Access Denied via RBAC) -->
+            <% if (accessDenied) { %>
+                <div class="mb-6 rounded-2xl border border-rose-200 bg-rose-50 p-5 text-rose-700">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">⚠️</span>
+                        <div>
+                            <h3 class="font-bold text-rose-800">Access Denied (403 Forbidden)</h3>
+                            <p class="text-sm mt-1"><%= errorMessage %></p>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+
+            <!-- Content Section based on Role -->
+            <div class="space-y-6">
+                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                    <h2 class="text-lg font-semibold text-slate-900 mb-2">Informasi Akun Anda</h2>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p class="text-slate-500">Username:</p>
+                            <p class="font-medium text-slate-800"><%= user.username %></p>
+                        </div>
+                        <div>
+                            <p class="text-slate-500">Hak Akses (Role):</p>
+                            <p class="font-medium text-slate-800 capitalize"><%= user.role %></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Special Feature Section -->
+                <% if (user.role === 'admin') { %>
+                    <div class="rounded-2xl border border-purple-200 bg-purple-50 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-purple-900 flex items-center gap-2">
+                                    <span>👑</span> Panel Kontrol & Administrasi RBAC
+                                </h3>
+                                <p class="text-sm text-purple-700 mt-0.5">Fitur dan data khusus yang hanya dapat diakses oleh Admin.</p>
+                            </div>
+                            <% if (typeof adminView === 'undefined' || !adminView) { %>
+                                <a href="/admin/panel" class="rounded-xl bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-700 shadow-sm">
+                                    Buka Panel Lengkap Admin
+                                </a>
+                            <% } else { %>
+                                <a href="/dashboard" class="rounded-xl border border-purple-300 bg-white px-3 py-1.5 text-xs font-semibold text-purple-700 transition hover:bg-purple-100">
+                                    Tutup View Detail
+                                </a>
+                            <% } %>
+                        </div>
+
+                        <% if (typeof adminView !== 'undefined' && adminView) { %>
+                            <div class="mt-6 space-y-6 border-t border-purple-200 pt-6">
+                                <!-- 1. Mengelola Data User & Role -->
+                                <div>
+                                    <h4 class="font-bold text-purple-900 text-md mb-3 flex items-center gap-1.5">
+                                        👥 1. Mengelola Data User & Role
+                                    </h4>
+                                    <div class="overflow-x-auto rounded-xl border border-purple-200 bg-white shadow-sm">
+                                        <table class="w-full text-left text-sm text-slate-700">
+                                            <thead class="bg-purple-100/70 text-purple-900 font-semibold text-xs uppercase tracking-wider">
+                                                <tr>
+                                                    <th class="px-4 py-3">Nama</th>
+                                                    <th class="px-4 py-3">Username</th>
+                                                    <th class="px-4 py-3">Role Saat Ini</th>
+                                                    <th class="px-4 py-3">Ubah Role</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-purple-100">
+                                                <% if (typeof usersList !== 'undefined' && usersList && usersList.length > 0) { %>
+                                                    <% usersList.forEach(u => { %>
+                                                        <tr class="hover:bg-purple-50/50">
+                                                            <td class="px-4 py-3 font-medium text-slate-900"><%= u.name %></td>
+                                                            <td class="px-4 py-3 text-slate-600"><%= u.username %></td>
+                                                            <td class="px-4 py-3">
+                                                                <span class="rounded-full px-2.5 py-0.5 text-xs font-bold <%= u.role === 'admin' ? 'bg-purple-100 text-purple-700 border border-purple-300' : 'bg-slate-100 text-slate-700 border border-slate-300' %>">
+                                                                    <%= u.role %>
+                                                                </span>
+                                                            </td>
+                                                            <td class="px-4 py-3">
+                                                                <form action="/admin/update-role" method="POST" class="flex items-center gap-2">
+                                                                    <input type="hidden" name="username" value="<%= u.username %>">
+                                                                    <select name="newRole" class="rounded-lg border border-purple-300 bg-white px-2 py-1 text-xs text-slate-800 outline-none focus:ring-1 focus:ring-purple-500">
+                                                                        <option value="user" <%= u.role === 'user' ? 'selected' : '' %>>user</option>
+                                                                        <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>admin</option>
+                                                                    </select>
+                                                                    <button type="submit" class="rounded-lg bg-purple-700 px-3 py-1 text-xs font-semibold text-white hover:bg-purple-800 transition">
+                                                                        Simpan
+                                                                    </button>
+                                                                </form>
+                                                            </td>
+                                                        </tr>
+                                                    <% }) %>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- 2. Melihat Log Aktivitas Sistem -->
+                                <div>
+                                    <h4 class="font-bold text-purple-900 text-md mb-3 flex items-center gap-1.5">
+                                        📜 2. Log Aktivitas Sistem (Audit Trail)
+                                    </h4>
+                                    <div class="overflow-x-auto rounded-xl border border-purple-200 bg-white shadow-sm max-h-48 overflow-y-auto">
+                                        <table class="w-full text-left text-xs text-slate-700">
+                                            <thead class="bg-purple-100/70 text-purple-900 font-semibold uppercase tracking-wider sticky top-0">
+                                                <tr>
+                                                    <th class="px-4 py-2.5">Waktu</th>
+                                                    <th class="px-4 py-2.5">User</th>
+                                                    <th class="px-4 py-2.5">Aksi</th>
+                                                    <th class="px-4 py-2.5">Status</th>
+                                                    <th class="px-4 py-2.5">Detail</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-purple-100">
+                                                <% if (typeof logs !== 'undefined' && logs && logs.length > 0) { %>
+                                                    <% logs.forEach(log => { %>
+                                                        <tr class="hover:bg-purple-50/50">
+                                                            <td class="px-4 py-2 font-mono text-slate-500"><%= log.timestamp %></td>
+                                                            <td class="px-4 py-2 font-semibold text-slate-800"><%= log.user %></td>
+                                                            <td class="px-4 py-2 text-purple-800 font-medium"><%= log.action %></td>
+                                                            <td class="px-4 py-2">
+                                                                <span class="rounded px-2 py-0.5 font-bold text-[10px] <%= log.status === 'SUCCESS' || log.status === 'GRANTED' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700' %>">
+                                                                    <%= log.status %>
+                                                                </span>
+                                                            </td>
+                                                            <td class="px-4 py-2 text-slate-600"><%= log.detail %></td>
+                                                        </tr>
+                                                    <% }) %>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- 3. Mengubah Pengaturan Akses RBAC -->
+                                <div>
+                                    <h4 class="font-bold text-purple-900 text-md mb-3 flex items-center gap-1.5">
+                                        🛡️ 3. Pengaturan Matriks Akses RBAC Route
+                                    </h4>
+                                    <div class="overflow-x-auto rounded-xl border border-purple-200 bg-white shadow-sm">
+                                        <table class="w-full text-left text-xs text-slate-700">
+                                            <thead class="bg-purple-100/70 text-purple-900 font-semibold uppercase tracking-wider">
+                                                <tr>
+                                                    <th class="px-4 py-2.5">Route Endpoint</th>
+                                                    <th class="px-4 py-2.5">Role Izin Akses</th>
+                                                    <th class="px-4 py-2.5">Deskripsi Proteksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-purple-100">
+                                                <% if (typeof rules !== 'undefined' && rules && rules.length > 0) { %>
+                                                    <% rules.forEach(rule => { %>
+                                                        <tr class="hover:bg-purple-50/50">
+                                                            <td class="px-4 py-2 font-mono text-purple-900 font-bold"><%= rule.route %></td>
+                                                            <td class="px-4 py-2">
+                                                                <div class="flex gap-1">
+                                                                    <% rule.roles.forEach(r => { %>
+                                                                        <span class="rounded bg-slate-100 border border-slate-300 px-2 py-0.5 text-[10px] font-semibold text-slate-700 uppercase">
+                                                                            <%= r %>
+                                                                        </span>
+                                                                    <% }) %>
+                                                                </div>
+                                                            </td>
+                                                            <td class="px-4 py-2 text-slate-600"><%= rule.description %></td>
+                                                        </tr>
+                                                    <% }) %>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                <% } else { %>
+                    <div class="rounded-2xl border border-blue-200 bg-blue-50/50 p-6">
+                        <h3 class="text-lg font-semibold text-blue-900">👤 Halaman Pengguna Standard</h3>
+                        <p class="text-sm text-blue-700 mt-1">Anda masuk sebagai User biasa. Hak akses Anda terbatas pada fitur standar.</p>
+                        <div class="mt-4">
+                            <a href="/admin/panel" class="inline-block rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:border-rose-400 hover:text-rose-600 transition">
+                                Coba Akses Route Khusus Admin (Tes RBAC Protection)
+                            </a>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Footer Action -->
+            <div class="mt-8 flex justify-between items-center border-t border-slate-100 pt-6">
+                <a href="/" class="text-sm font-medium text-sky-600 hover:text-sky-700">
+                    ← Kembali ke Halaman Utama
+                </a>
+                <a href="/logout" class="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-rose-300 hover:text-rose-600">
+                    Sign Out
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

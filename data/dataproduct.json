@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "name": "Enterprise Dashboard",
+    "category": "Analytics",
+    "description": "A comprehensive analytics platform for monitoring business performance in real time.",
+    "price": "$129"
+  },
+  {
+    "id": 2,
+    "name": "Secure Auth Suite",
+    "category": "Security",
+    "description": "A robust authentication solution designed to protect every user session.",
+    "price": "$89"
+  },
+  {
+    "id": 3,
+    "name": "Workflow Studio",
+    "category": "Productivity",
+    "description": "An intuitive workspace for coordinating tasks, approvals, and collaboration.",
+    "price": "$159"
+  },
+  {
+    "id": 4,
+    "name": "Cloud Storage Pro",
+    "category": "Storage",
+    "description": "A scalable cloud storage solution with advanced data management features.",
+    "price": "$49"
+  },
+  {
+    "id": 5,
+    "name": "AI Insights Engine",
+    "category": "Artificial Intelligence",
+    "description": "An AI-powered analytics engine that provides actionable insights from complex datasets.",
+    "price": "$199"
+  }
+]
